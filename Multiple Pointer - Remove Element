@@ -1,0 +1,27 @@
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int slow = 0;
+        for (int fast = 0; fast < nums.size(); ++fast) {
+            if (nums[fast] != val) {
+                nums[slow++] = nums[fast];
+            }
+        }
+        return slow;
+    }
+};
+
+/*class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+
+        for (vector<int>::iterator it = nums.begin(); it != nums.end();) {
+            if (*it == val) {
+                it = nums.erase(it);
+            } else {
+                ++it;
+            }
+        }
+        return nums.size();
+    }
+};*/
