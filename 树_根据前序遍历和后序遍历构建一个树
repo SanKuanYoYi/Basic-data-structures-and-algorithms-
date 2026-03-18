@@ -1,0 +1,50 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ * right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* constructFromPrePost(vector<int>& preorder,
+                                   vector<int>& postorder) {
+        unordered_map<int, int> postMap;
+        for (int i = 0; i < preorder.size(); i++) {
+            postMap[postorder[i]] = i;
+        }
+        return build(preorder, 0, preorder.size() - 1, postorder, 0,
+                     postorder.size() - 1, postMap);
+    }
+
+    TreeNode* build(vector<int>& preorder, int preStart, int preEnd,
+                    vector<int>& postorder, int postStart, int postEnd,
+                    unordered_map<int, int>& postMap) {
+        if (preStart > preEnd)
+            return nullptr;
+
+        int rootVal = preorder[preStart];
+        TreeNode* root = new TreeNode(rootVal);
+
+        if (preStart == preEnd)
+            return root;
+
+        int leftRootVal = preorder[preStart + 1];
+        int leftRootPosInPost = postMap[leftRootVal];
+
+        int rootIdx = postMap[rootVal];
+        int leftSize = leftRootPosInPost - postStart + 1;
+
+        root->left = build(preorder, preStart + 1, preStart + leftSize,
+                           postorder, postStart, leftRootPosInPost, postMap);
+        root->right =
+            build(preorder, preStart + leftSize + 1, preEnd, postorder,
+                  leftRootPosInPost + 1, preEnd - 1, postMap);
+        return root;
+    }
+};
