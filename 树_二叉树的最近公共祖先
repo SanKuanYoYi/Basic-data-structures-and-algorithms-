@@ -1,0 +1,60 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+ /*///////////////////////////////////////////////////
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+
+        unordered_map<TreeNode*, TreeNode*> parent;
+        unordered_map<TreeNode*, int> depth;
+        parent[root] = nullptr;
+        depth[root] = 0;
+
+        queue<TreeNode*> que;
+        que.push(root);
+        while (!que.empty()) {
+            TreeNode* node = que.front(); que.pop();
+            if (node->left) {
+                parent[node->left] = node;
+                depth[node->left] = depth[node] + 1;
+                que.push(node->left);
+            }
+            if (node->right) {
+                parent[node->right] = node;
+                depth[node->right] = depth[node] + 1;
+                que.push(node->right);
+            }
+        }
+
+        while (depth[p] > depth[q]) p = parent[p];
+        while (depth[q] > depth[p]) q = parent[q];
+
+        while (p != q) {
+            p = parent[p];
+            q = parent[q];
+        }
+        return q;
+    }
+};
+*//////////////////////////////////////////////////////
+
+class Solution {
+public:
+   TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+       if (!root || root == p || root == q)
+           return root;
+       TreeNode* left = lowestCommonAncestor(root->left, p, q);
+       TreeNode* right = lowestCommonAncestor(root->right, p, q);
+       if (left && right)
+           return root;
+       return left ? left : right;
+   }
+};
