@@ -1,0 +1,93 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ * right(right) {}
+ * };
+ */
+
+/*/////////////////////////////////////////////////////////
+class Solution {
+public:
+    bool isEvenOddTree(TreeNode* root) {
+        if (!root)
+            return true;
+        queue<TreeNode*> q;
+        q.push(root);
+        int levelCount = 0;
+        while (!q.empty()) {
+            int levelSize = q.size();
+            int prevVal = (levelCount % 2 == 0) ? INT_MIN : INT_MAX;
+            while (levelSize--) {
+                int flagEven = (levelCount % 2 == 0) ? 1 : 0;
+                TreeNode* node = q.front();
+                q.pop();
+                if (flagEven) {
+                    if (node->val % 2 == 0)
+                        return false;
+                } else {
+                    if (node->val % 2 == 1)
+                        return false;
+                }
+                if (levelCount % 2 == 0) {
+                    if (node->val <= prevVal)
+                        return false;
+                } else {
+                    if (node->val >= prevVal)
+                        return false;
+                }
+                prevVal = node->val;
+                if (node->left)
+                    q.push(node->left);
+                if (node->right)
+                    q.push(node->right);
+            }
+            levelCount++;
+        }
+        return true;
+    }
+};
+*///////////////////////////////////////////////////////
+
+class Solution {
+public:
+    bool isEvenOddTree(TreeNode* root) {
+        if (!root)
+            return true;
+        vector<int> prevVals;
+        return dfs(root, 0, prevVals);
+    }
+
+    bool dfs(TreeNode* root, int depth, vector<int>& prevVals) {
+        if (!root)
+            return true;
+        if (depth % 2 == 0) {
+            if (root->val % 2 == 0)
+                return false;
+        } else {
+            if (root->val % 2 == 1)
+                return false;
+        }
+        if (depth == prevVals.size()) {
+            if (depth % 2 == 0)
+                prevVals.emplace_back(INT_MIN);
+            else
+                prevVals.emplace_back(INT_MAX);
+        }
+        if (depth % 2 == 0) {
+            if (root->val <= prevVals[depth])
+                return false;
+        } else {
+            if (root->val >= prevVals[depth])
+                return false;
+        }
+        prevVals[depth] = root->val;
+        return dfs(root->left, depth + 1, prevVals) &&
+               dfs(root->right, depth + 1, prevVals);
+    }
+};
