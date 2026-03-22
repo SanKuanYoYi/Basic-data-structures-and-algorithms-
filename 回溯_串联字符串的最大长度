@@ -1,0 +1,46 @@
+class Solution {
+public:
+    int maxLength(vector<string>& arr) {
+        int hash[26] = {0};
+        int maxLen = 0;
+        dfs(arr, 0, hash, 0, maxLen);
+        return maxLen;
+    }
+
+    void dfs(vector<string>& arr, int index, int* hash, int curLen,
+             int& maxLen) {
+        maxLen = max(curLen, maxLen);
+        for (int i = index; i < arr.size(); i++) {
+            int word[26] = {0};
+            bool isValid = true;
+            for (char c : arr[i]) {
+                int idx = c - 'a';
+                word[idx]++;
+                if (word[idx] > 1) {
+                    isValid = false;
+                    break;
+                }
+            }
+            if (!isValid)
+                continue;
+
+            bool isConflict = false;
+            for (char c : arr[i]) {
+                if (hash[c - 'a'] > 0) {
+                    isConflict = true;
+                    break;
+                }
+            }
+            if (isConflict)
+                continue;
+            for (char c : arr[i]) {
+                hash[c - 'a']++;
+            }
+            int newLen = curLen + arr[i].size();
+            dfs(arr, i + 1, hash, newLen, maxLen);
+            for (char c : arr[i]) {
+                hash[c - 'a']--;
+            }
+        }
+    }
+};
