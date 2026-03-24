@@ -1,0 +1,29 @@
+class Solution {
+public:
+    int countNumbersWithUniqueDigits(int n) {
+        if (!n)
+            return 1;
+        int count = 1;
+        vector<bool> used(10, false);
+
+        for (int len = 1; len <= n; len++) {
+            backtrack(count, used, 0, len, n);
+        }
+        return count;
+    }
+
+    void backtrack(int& count, vector<bool>& used, int index, int len, int n) {
+        if (index == len) {
+            count++;
+            return;
+        }
+        int start = (!index) ? 1 : 0;
+        for (int digit = start; digit <= 9; digit++) {
+            if (used[digit])
+                continue;
+            used[digit] = true;
+            backtrack(count, used, index + 1, len, n);
+            used[digit] = false;
+        }
+    }
+};
