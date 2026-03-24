@@ -1,0 +1,32 @@
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> ans;
+        vector<string> board(n, string(n, '.'));
+        vector<bool> colUsed(n, false);
+        vector<bool> diagonal1(2 * n - 1, false);
+        vector<bool> diagonal2(2 * n - 1, false);
+        backtrack(ans, board, colUsed, diagonal1, diagonal2, 0, n);
+        return ans;
+    }
+
+    void backtrack(vector<vector<string>>& ans, vector<string>& board,
+                   vector<bool>& colUsed, vector<bool>& diagonal1,
+                   vector<bool>& diagonal2, int row, int n) {
+        if (row == n) {
+            ans.push_back(board);
+            return;
+        }
+        for (int col = 0; col < n; col++) {
+            int d1 = row + col;
+            int d2 = row - col + n - 1;
+            if (colUsed[col] || diagonal1[d1] || diagonal2[d2])
+                continue;
+            board[row][col] = 'Q';
+            colUsed[col] = diagonal1[d1] = diagonal2[d2] = true;
+            backtrack(ans, board, colUsed, diagonal1, diagonal2, row + 1, n);
+            board[row][col] = '.';
+            colUsed[col] = diagonal1[d1] = diagonal2[d2] = false;
+        }
+    }
+};
