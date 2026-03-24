@@ -1,0 +1,27 @@
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        vector<string> ans;
+        string path;
+        backtrack(ans, path, 0, 0, n);
+        return ans;
+    }
+
+    void backtrack(vector<string>& ans, string& path, int left, int right,
+                   int n) {
+        if (path.size() == 2 * n) {
+            ans.push_back(path);
+            return;
+        }
+        if (left < n) {
+            path.push_back('(');
+            backtrack(ans, path, left + 1, right, n);
+            path.pop_back();
+        }
+        if (right < left) {
+            path.push_back(')');
+            backtrack(ans, path, left, right + 1, n);
+            path.pop_back();
+        }
+    }
+};
