@@ -1,0 +1,39 @@
+/*/////////////////////////////////////////////////////
+class Solution {
+public:
+    int climbStairs(int n) {
+        if (n == 1)
+            return 1;
+        if (n == 2)
+            return 2;
+        vector<int> dp(n, 0);
+        dp[0] = 1;
+        dp[1] = 2;
+        for (int i = 2; i < n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[n - 1];
+    }
+};
+*/////////////////////////////////////////////////////////////
+
+class Solution {
+public:
+    int climbStairs(int n) {
+        if (!n)
+            return 0;
+        if (n == 1)
+            return 1;
+        if (n == 2)
+            return 2;
+        int dp_pre1 = 2;
+        int dp_pre2 = 1;
+        int dp_cur = 0;
+        for (int i = 3; i <= n; i++) {
+            dp_cur = dp_pre1 + dp_pre2;
+            dp_pre2 = dp_pre1;
+            dp_pre1 = dp_cur;
+        }
+        return dp_cur;
+    }
+};
