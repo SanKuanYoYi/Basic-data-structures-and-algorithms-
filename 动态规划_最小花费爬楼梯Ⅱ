@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int climbStairs(int n, vector<int>& costs) {
+        if (n == 0)
+            return 0;
+        int dp0 = 0;
+        int dp1 = 0;
+        int dp2 = 0;
+
+        dp2 = costs[0] + 1; // 0->1
+        if (n == 1)
+            return dp2;
+
+        int cur2 = costs[1] + min(dp2 + 1, dp0 + 4); // 0->2/0->1->1
+        dp1 = dp2;
+        dp2 = cur2;
+        if (n == 2)
+            return dp2;
+
+        int cur3 = costs[2] + min({dp2 + 1, dp1 + 4, dp0 + 9});
+        dp0 = dp1;
+        dp1 = dp2;
+        dp2 = cur3;
+        if (n == 3)
+            return dp2;
+
+        for (int i = 4; i <= n; ++i) {
+            long long cur = costs[i - 1] + min({dp2 + 1, dp1 + 4, dp0 + 9});
+            dp0 = dp1;
+            dp1 = dp2;
+            dp2 = cur;
+        }
+        return dp2;
+    }
+};
