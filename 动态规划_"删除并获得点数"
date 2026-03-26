@@ -1,0 +1,23 @@
+class Solution {
+public:
+    int deleteAndEarn(vector<int>& nums) {
+        int mx = *max_element(nums.begin(), nums.end());
+        vector<int> sum(mx + 1, 0);
+        for (int x : nums) {
+            sum[x] += x;
+        }
+        return f(sum);
+    }
+
+    int f(vector<int>& nums) {
+        int dp_pre1 = 0; // dp[i-1]
+        int dp_pre2 = 0; // dp[i-2]
+        int dp_cur;
+        for (int x : nums) {
+            dp_cur = max(dp_pre1, dp_pre2 + x);
+            dp_pre2 = dp_pre1;
+            dp_pre1 = dp_cur;
+        }
+        return dp_cur;
+    }
+};
