@@ -1,0 +1,30 @@
+/*//////////////////////////////////////////////////////////
+class Solution {
+public:
+    int minCostClimbingStairs(vector<int>& cost) {
+        int size = cost.size();
+        vector<int> dp(size + 1);
+        dp[0] = dp[1] = 0;
+        for (int i = 2; i <= size; i++) {
+            dp[i] = min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2]);
+        }
+        return dp[size];
+    }
+};
+*/////////////////////////////////////////////////
+
+class Solution {
+public:
+    int minCostClimbingStairs(vector<int>& cost) {
+        int size = cost.size();
+        int dp_pre1 = 0;
+        int dp_pre2 = 0;
+        int dp_cur;
+        for (int i = 2; i <= size; i++) {
+            dp_cur = min(dp_pre1 + cost[i - 1], dp_pre2 + cost[i - 2]);
+            dp_pre2 = dp_pre1;
+            dp_pre1 = dp_cur;
+        }
+        return dp_cur;
+    }
+};
