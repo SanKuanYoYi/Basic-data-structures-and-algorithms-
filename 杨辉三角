@@ -1,0 +1,20 @@
+class Solution {
+public:
+    vector<vector<int>> generate(int numRows) {
+        vector<vector<int>> ans;
+        for (int i = 0; i < numRows; i++) {
+            vector<int> level(i + 1, 1);
+            if (i >= 2) {
+                int mid = i / 2;
+                for (int j = 1; j <= mid; j++) {
+                    level[j] = ans[i - 1][j - 1] + ans[i - 1][j];
+                }
+                for (int j = mid + 1; j < i; j++) {
+                    level[j] = level[i - j];
+                }
+            }
+            ans.emplace_back(level);
+        }
+        return ans;
+    }
+};
