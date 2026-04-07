@@ -1,0 +1,58 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ * right(right) {}
+ * };
+ */
+
+/*///////////////////////////////////////////////////////
+class Solution {
+public:
+   void flatten(TreeNode* root) {
+       if (!root)
+           return;
+       vector<TreeNode*> nodes;
+       preorder(root, nodes);
+       for (int i = 0; i < nodes.size() - 1; ++i) {
+           nodes[i]->left = nullptr;
+           nodes[i]->right = nodes[i + 1];
+       }
+       nodes.back()->left = nullptr;
+       nodes.back()->right = nullptr;
+   }
+
+   void preorder(TreeNode* root, vector<TreeNode*>& nodes) {
+       if (!root)
+           return;
+       nodes.push_back(root);
+       preorder(root->left, nodes);
+       preorder(root->right, nodes);
+   }
+};
+*///////////////////////////////////////////////////////////
+
+
+class Solution {
+public:
+    void flatten(TreeNode* root) {
+        if (!root)
+            return;
+        flatten(root->left);
+        flatten(root->right);
+
+        TreeNode* right = root->right;
+        root->right = root->left;
+        root->left = nullptr;
+
+        TreeNode* p = root;
+        while (p->right)
+            p = p->right;
+        p->right = right;
+    }
+};
