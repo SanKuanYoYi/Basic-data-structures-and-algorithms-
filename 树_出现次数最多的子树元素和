@@ -1,0 +1,89 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ * right(right) {}
+ * };
+ */
+
+/*///////////////////////////////////////////////////////////////
+class Solution {
+public:
+   vector<int> findFrequentTreeSum(TreeNode* root) {
+       vector<int> ans;
+       if (!root)
+           return ans;
+       unordered_map<int, int> frequency;
+       int maxFreq = 0;
+       dfs(root, maxFreq, frequency);
+       for (auto [sum, cnt] : frequency) {
+           if (cnt == maxFreq)
+               ans.emplace_back(sum);
+       }
+       return ans;
+   }
+
+   int dfs(TreeNode* root, int& maxFreq, unordered_map<int, int>& frequency) {
+       if (!root)
+           return 0;
+       int left = dfs(root->left, maxFreq, frequency);
+       int right = dfs(root->right, maxFreq, frequency);
+       int total = root->val + left + right;
+       frequency[total]++;
+       maxFreq = max(maxFreq, frequency[total]);
+       return total;
+   }
+};
+*///////////////////////////////////////////////////////////////////
+
+
+class Solution {
+public:
+    vector<int> findFrequentTreeSum(TreeNode* root) {
+        vector<int> ans;
+        if (!root)
+            return ans;
+
+        unordered_map<int, int> freq;
+        unordered_map<TreeNode*, int> sumMap;
+        stack<TreeNode*> stk;
+        TreeNode* prev = nullptr;
+        TreeNode* curr = root;
+
+        while (curr || !stk.empty()) {
+            while (curr) {
+                stk.push(curr);
+                curr = curr->left;
+            }
+            curr = stk.top();
+            if (curr->right && curr->right != prev) {
+                curr = curr->right;
+            } else {
+                int leftSum = sumMap[curr->left];
+                int rightSum = sumMap[curr->right];
+                int total = curr->val + leftSum + rightSum;
+                sumMap[curr] = total;
+                freq[total]++;
+                stk.pop();
+                prev = curr;
+                curr = nullptr;
+            }
+        }
+
+        int maxFreq = 0;
+        for (auto& [sum, cnt] : freq) {
+            if (cnt > maxFreq)
+                maxFreq = cnt;
+        }
+        for (auto& [sum, cnt] : freq) {
+            if (cnt == maxFreq)
+                ans.push_back(sum);
+        }
+        return ans;
+    }
+};
