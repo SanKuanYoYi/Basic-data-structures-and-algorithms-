@@ -1,0 +1,37 @@
+class Solution {
+public:
+    vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+
+        /*
+        sort(nums1.begin(), nums1.end());
+        sort(nums2.begin(), nums2.end());
+        int len1 = nums1.size();
+        int len2 = nums2.size();
+        vector<int> ans;
+        int idx1 = 0, idx2 = 0;
+        while (idx1 < len1 && idx2 < len2) {
+            int a = nums1[idx1], b = nums2[idx2];
+            if (a == b) {
+                if (ans.empty() || a != ans.back())
+                    ans.emplace_back(a);
+                idx1++;
+                idx2++;
+            } else if (a < b) {
+                idx1++;
+            }
+
+            else
+                idx2++;
+        }
+        return ans;
+        */
+
+        unordered_set<int> s(nums1.begin(), nums1.end());
+        unordered_set<int> ans;
+        for (int num : nums2) {
+            if (s.count(num))
+                ans.insert(num);
+        }
+        return vector<int>(ans.begin(), ans.end());
+    }
+};
