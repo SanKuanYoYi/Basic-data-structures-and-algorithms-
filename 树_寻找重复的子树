@@ -1,0 +1,63 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ * right(right) {}
+ * };
+ */
+
+/*//////////////////////////////////////////////////////////////
+class Solution {
+public:
+   unordered_map<string, int> match;
+   vector<TreeNode*> ans;
+
+   vector<TreeNode*> findDuplicateSubtrees(TreeNode* root) {
+       dfs(root);
+       return ans;
+   }
+
+   string dfs(TreeNode* root) {
+       if (!root)
+           return "";
+       string s = to_string(root->val) + " " + dfs(root->left) + " " +
+                  dfs(root->right);
+       match[s]++;
+       if (match[s] == 2)
+           ans.emplace_back(root);
+       return s;
+   }
+};
+*////////////////////////////////////////////////////////////////
+
+class Solution {
+public:
+    vector<TreeNode*> findDuplicateSubtrees(TreeNode* root) {
+        vector<TreeNode*> ans;
+        unordered_map<string, int> id;
+        unordered_map<int, int> cnt;
+        dfs(root, ans, id, cnt);
+        return ans;
+    }
+
+    int dfs(TreeNode* root, vector<TreeNode*>& ans,
+            unordered_map<string, int>& id, unordered_map<int, int>& cnt) {
+        if (!root)
+            return 0;
+        int leftID = dfs(root->left, ans, id, cnt);
+        int rightID = dfs(root->right, ans, id, cnt);
+        string key = to_string(root->val) + " " + to_string(leftID) + " " +
+                     to_string(rightID);
+        if (!id.count(key))
+            id[key] = id.size() + 1;
+        int curId = id[key];
+        if (++(cnt[curId]) == 2)
+            ans.emplace_back(root);
+        return curId;
+    }
+};
