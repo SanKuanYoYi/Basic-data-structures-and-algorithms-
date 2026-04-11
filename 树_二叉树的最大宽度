@@ -1,0 +1,65 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ * right(right) {}
+ * };
+ */
+
+/*////////////////////////////////////////////////////////////////
+class Solution {
+public:
+   int widthOfBinaryTree(TreeNode* root) {
+       if (!root)
+           return 0;
+       unsigned long long maxWidth = 0;
+       queue<pair<TreeNode*, unsigned long long>> q;
+       q.push({root, 1});
+       while (!q.empty()) {
+           int levelSize = q.size();
+           unsigned long long leftId = q.front().second;
+           unsigned long long roghtId = 0;
+           for (int i = 0; i < levelSize; i++) {
+               auto [node, id] = q.front();
+               q.pop();
+               roghtId = id;
+               if (node->left)
+                   q.push({node->left, id * 2});
+               if (node->right)
+                   q.push({node->right, id * 2 + 1});
+           }
+           maxWidth = max(maxWidth, roghtId - leftId + 1);
+       }
+       return maxWidth;
+   }
+};
+*///////////////////////////////////////////////////////////////
+
+class Solution {
+public:
+    vector<unsigned long long> firstPos;
+
+    int widthOfBinaryTree(TreeNode* root) {
+        if (!root)
+            return 0;
+        int maxWidth = 0;
+        dfs(root, 1, 1, maxWidth);
+        return maxWidth;
+    }
+
+    void dfs(TreeNode* node, unsigned long long id, int depth, int& maxWidth) {
+        if (!node)
+            return;
+        if (firstPos.size() < depth) {
+            firstPos.push_back(id);
+        }
+        maxWidth = max(maxWidth, (int)(id - firstPos[depth - 1] + 1));
+        dfs(node->left, id * 2, depth + 1, maxWidth);
+        dfs(node->right, id * 2 + 1, depth + 1, maxWidth);
+    }
+};
