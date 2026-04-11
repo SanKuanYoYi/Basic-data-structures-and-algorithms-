@@ -1,0 +1,59 @@
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        vector<int> temp(nums.size());
+        mergeSort(nums, 0, nums.size() - 1, temp);
+        return nums;
+    }
+
+    void mergeSort(vector<int>& nums, int left, int right, vector<int>& temp) {
+        if (left >= right)
+            return;
+        int mid = left + (right - left) / 2;
+        mergeSort(nums, left, mid, temp);
+        mergeSort(nums, mid + 1, right, temp);
+        int i = left, j = mid + 1;
+        int idx = left;
+        while (i <= mid && j <= right) {
+            if (nums[i] <= nums[j])
+                temp[idx++] = nums[i++];
+            else
+                temp[idx++] = nums[j++];
+        }
+        while (i <= mid) {
+            temp[idx++] = nums[i++];
+        }
+        while (j <= right) {
+            temp[idx++] = nums[j++];
+        }
+        for (int i = left; i <= right; ++i) {
+            nums[i] = temp[i];
+        }
+    }
+
+    /*
+        vector<int> sortArray(vector<int>& nums) {
+            quickSort(nums, 0, nums.size() - 1);
+            return nums;
+        }
+
+        void quickSort(vector<int>& nums, int left, int right) {
+            if (left >= right)
+                return;
+            int idx = partition(nums, left, right);
+            quickSort(nums, left, idx - 1);
+            quickSort(nums, idx + 1, right);
+        }
+
+        int partition(vector<int>& nums, int left, int right) {
+            int pivot = nums[right];
+            int idx = left;
+            for (int i = left; i < right; ++i) {
+                if (nums[i] < pivot)
+                    swap(nums[idx++], nums[i]);
+            }
+            swap(nums[idx], nums[right]);
+            return idx;
+        }
+    */
+};
