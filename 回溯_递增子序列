@@ -1,0 +1,25 @@
+class Solution {
+public:
+    vector<vector<int>> findSubsequences(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> path;
+        backtracking(ans, path, 0, nums);
+        return ans;
+    }
+
+    void backtracking(vector<vector<int>>& ans, vector<int> path, int start,
+                      vector<int>& nums) {
+        if (path.size() > 1)
+            ans.emplace_back(path);
+        unordered_set<int> record;
+        for (int i = start; i < nums.size(); i++) {
+            if (record.count(nums[i]) ||
+                (!path.empty() && nums[i] < path.back()))
+                continue;
+            record.insert(nums[i]);
+            path.emplace_back(nums[i]);
+            backtracking(ans, path, i + 1, nums);
+            path.pop_back();
+        }
+    }
+};
