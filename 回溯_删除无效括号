@@ -1,0 +1,54 @@
+class Solution {
+public:
+    vector<string> removeInvalidParentheses(string s) {
+        int leftToRemove = 0, rightToRemove = 0;
+        for (char c : s) {
+            if (c == '(')
+                leftToRemove++;
+            else if (c == ')') {
+                if (leftToRemove)
+                    leftToRemove--;
+                else
+                    rightToRemove++;
+            }
+        }
+        unordered_set<string> set;
+        string cur;
+        dfs(s, 0, cur, 0, 0, leftToRemove, rightToRemove, set);
+        return vector<string>(set.begin(), set.end());
+    }
+
+    void dfs(string& s, int index, string& cur, int l, int r, int leftToRemove,
+             int rightToRemove, unordered_set<string>& set) {
+        if (index == s.length()) {
+            if (l == r && leftToRemove == 0 && rightToRemove == 0)
+                set.insert(cur);
+            return;
+        }
+        char c = s[index];
+        if (c == '(') {
+            if (leftToRemove > 0) {
+                dfs(s, index + 1, cur, l, r, leftToRemove - 1, rightToRemove,
+                    set);
+            }
+            cur.push_back(c);
+            dfs(s, index + 1, cur, l + 1, r, leftToRemove, rightToRemove, set);
+            cur.pop_back();
+        } else if (c == ')') {
+            if (rightToRemove > 0) {
+                dfs(s, index + 1, cur, l, r, leftToRemove, rightToRemove - 1,
+                    set);
+            }
+            if (l > r) {
+                cur.push_back(c);
+                dfs(s, index + 1, cur, l, r + 1, leftToRemove, rightToRemove,
+                    set);
+                cur.pop_back();
+            }
+        } else {
+            cur.push_back(c);
+            dfs(s, index + 1, cur, l, r, leftToRemove, rightToRemove, set);
+            cur.pop_back();
+        }
+    }
+};
