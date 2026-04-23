@@ -1,0 +1,54 @@
+class Solution {
+public:
+    void solveSudoku(vector<vector<char>>& board) {
+        vector<vector<bool>> rowsUsed(9, vector<bool>(9, false));
+        vector<vector<bool>> colsUsed(9, vector<bool>(9, false));
+        vector<vector<bool>> boxesUsed(9, vector<bool>(9, false));
+
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 9; ++j) {
+                if (board[i][j] != '.') {
+                    int num = board[i][j] - '1';
+                    rowsUsed[i][num] = true;
+                    colsUsed[j][num] = true;
+                    int boxIdx = (i / 3) * 3 + (j / 3);
+                    boxesUsed[boxIdx][num] = true;
+                }
+            }
+        }
+        backtrack(board, 0, 0, rowsUsed, colsUsed, boxesUsed);
+    }
+
+private:
+    bool backtrack(vector<vector<char>>& board, int i, int j,
+                   vector<vector<bool>>& rowsUsed,
+                   vector<vector<bool>>& colsUsed,
+                   vector<vector<bool>>& boxesUsed) {
+        if (j == 9) {
+            j = 0;
+            i++;
+            if (i == 9)
+                return true;
+        }
+        if (board[i][j] != '.') {
+            return backtrack(board, i, j + 1, rowsUsed, colsUsed, boxesUsed);
+        }
+        for (int d = 0; d < 9; ++d) {
+            int boxIdx = (i / 3) * 3 + (j / 3);
+            if (!rowsUsed[i][d] && !colsUsed[j][d] && !boxesUsed[boxIdx][d]) {
+                board[i][j] = char('1' + d);
+                rowsUsed[i][d] = true;
+                colsUsed[j][d] = true;
+                boxesUsed[boxIdx][d] = true;
+                if (backtrack(board, i, j + 1, rowsUsed, colsUsed, boxesUsed)) {
+                    return true;
+                }
+                board[i][j] = '.';
+                rowsUsed[i][d] = false;
+                colsUsed[j][d] = false;
+                boxesUsed[boxIdx][d] = false;
+            }
+        }
+        return false;
+    }
+};
