@@ -1,0 +1,32 @@
+class Solution {
+public:
+    bool canPartitionKSubsets(vector<int>& nums, int k) {
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        if (sum % k != 0)
+            return false;
+        int target = sum / k;
+        sort(nums.begin(), nums.end(), greater<int>());
+        if (nums[0] > target)
+            return false;
+        vector<int> each(k, 0);
+        return backtrack(0, nums, each, target);
+    }
+
+    bool backtrack(int index, vector<int>& nums, vector<int>& each,
+                   int target) {
+        if (index == nums.size())
+            return true;
+        int cur = nums[index];
+        for (int i = 0; i < each.size(); i++) {
+            if (each[i] + cur > target)
+                continue;
+            if (i > 0 && each[i] == each[i - 1])
+                continue;
+            each[i] += cur;
+            if (backtrack(index + 1, nums, each, target))
+                return true;
+            each[i] -= cur;
+        }
+        return false;
+    }
+};
