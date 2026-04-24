@@ -1,0 +1,20 @@
+class Solution {
+public:
+    int findTargetSumWays(vector<int>& nums, int target) {
+        int n = nums.size();
+        int ans = 0;
+        backtrack(nums, target, n, ans, 0, 0);
+        return ans;
+    }
+
+    void backtrack(vector<int>& nums, int target, int n, int& ans, int index,
+                   int cur) {
+        if (index == n) {
+            if (cur == target)
+                ans++;
+            return;
+        }
+        backtrack(nums, target, n, ans, index + 1, cur + nums[index]);
+        backtrack(nums, target, n, ans, index + 1, cur - nums[index]);
+    }
+};
