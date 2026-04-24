@@ -1,0 +1,23 @@
+class Solution {
+public:
+    vector<vector<int>> allPathsSourceTarget(vector<vector<int>>& graph) {
+        vector<vector<int>> ans;
+        vector<int> path;
+        path.emplace_back(0);
+        backtrack(ans, path, graph, 0);
+        return ans;
+    }
+
+    void backtrack(vector<vector<int>>& ans, vector<int>& path,
+                   vector<vector<int>>& graph, int index) {
+        if (index == graph.size() - 1) {
+            ans.emplace_back(path);
+            return;
+        }
+        for (int i = 0; i < graph[index].size(); i++) {
+            path.emplace_back(graph[index][i]);
+            backtrack(ans, path, graph, graph[index][i]);
+            path.pop_back();
+        }
+    }
+};
