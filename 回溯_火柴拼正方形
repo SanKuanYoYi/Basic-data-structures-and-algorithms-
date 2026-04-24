@@ -1,0 +1,25 @@
+class Solution {
+public:
+    bool makesquare(vector<int>& matchsticks) {
+        int totalLen = accumulate(matchsticks.begin(), matchsticks.end(), 0);
+        if (totalLen % 4 != 0)
+            return false;
+        sort(matchsticks.begin(), matchsticks.end(), greater<int>());
+        vector<int> sideLen(4);
+        return backtrack(0, matchsticks, sideLen, totalLen / 4);
+    }
+
+    bool backtrack(int index, vector<int>& matchsticks, vector<int>& sideLen,
+                   int len) {
+        if (index == matchsticks.size())
+            return true;
+        for (int i = 0; i < 4; i++) {
+            sideLen[i] += matchsticks[index];
+            if (sideLen[i] <= len &&
+                backtrack(index + 1, matchsticks, sideLen, len))
+                return true;
+            sideLen[i] -= matchsticks[index];
+        }
+        return false;
+    }
+};
