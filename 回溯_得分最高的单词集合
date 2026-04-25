@@ -1,0 +1,52 @@
+class Solution {
+public:
+    int maxScoreWords(vector<string>& words, vector<char>& letters,
+                      vector<int>& score) {
+        int cnt[26] = {0};
+        for (char c : letters)
+            cnt[c - 'a']++;
+        int ans = 0;
+        dfs(words, cnt, score, 0, 0, ans);
+        return ans;
+    }
+
+    void dfs(vector<string>& words, int cnt[26], vector<int>& score, int idx,
+             int curScore, int& ans) {
+        if (idx == words.size()) {
+            ans = max(ans, curScore);
+            return;
+        }
+        // 1. 不选当前单词
+        dfs(words, cnt, score, idx + 1, curScore, ans);
+
+        // 2. 尝试选当前单词
+        int need[26] = {0};
+        int addScore = 0;
+        bool ok = true;
+        for (char c : words[idx]) {
+            int d = c - 'a';
+            need[d]++;
+            addScore += score[d];
+            if (need[d] > cnt[d]) {
+                ok = false;
+            }
+        }
+        /*
+        if (ok) {
+            for (int i = 0; i < 26; ++i) {
+                if (need[i] > cnt[i]) {
+                    ok = false;
+                    break;
+                }
+            }
+        }
+        */
+        if (ok) {
+            for (int i = 0; i < 26; ++i)
+                cnt[i] -= need[i];
+            dfs(words, cnt, score, idx + 1, curScore + addScore, ans);
+            for (int i = 0; i < 26; ++i)
+                cnt[i] += need[i];
+        }
+    }
+};
