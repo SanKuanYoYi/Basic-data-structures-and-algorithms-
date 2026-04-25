@@ -1,0 +1,31 @@
+class Solution {
+public:
+    vector<vector<int>> direct = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    int ans = 0;
+    int getMaximumGold(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] != 0)
+                    backtrack(i, j, grid, 0, m, n);
+            }
+        }
+        return ans;
+    }
+
+    void backtrack(int i, int j, vector<vector<int>>& grid, int sum, int m,
+                   int n) {
+        sum += grid[i][j];
+        ans = max(ans, sum);
+        int temp = grid[i][j];
+        grid[i][j] = 0;
+        for (int index = 0; index < 4; index++) {
+            int nextI = i + direct[index][0];
+            int nextJ = j + direct[index][1];
+            if (nextI >= 0 && nextI < m && nextJ >= 0 && nextJ < n &&
+                grid[nextI][nextJ])
+                backtrack(nextI, nextJ, grid, sum, m, n);
+        }
+        grid[i][j] = temp;
+    }
+};
