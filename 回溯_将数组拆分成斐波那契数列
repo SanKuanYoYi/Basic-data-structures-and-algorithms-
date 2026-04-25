@@ -1,0 +1,36 @@
+class Solution {
+public:
+    vector<int> splitIntoFibonacci(string num) {
+        vector<int> ans;
+        backtrack(num, ans, 0);
+        return ans;
+    }
+
+    bool backtrack(const string& num, vector<int>& ans, int start) {
+        if (start == num.size()) {
+            return ans.size() >= 3;
+        }
+        long long cur = 0;
+        for (int i = start; i < num.size(); ++i) {
+            if (i > start && num[start] == '0')
+                break;
+            cur = cur * 10 + (num[i] - '0');
+            if (cur > INT_MAX)
+                break;
+
+            int n = ans.size();
+            if (n >= 2) {
+                long long sum = (long long)ans[n - 2] + ans[n - 1];
+                if (cur < sum)
+                    continue;
+                if (cur > sum)
+                    break;
+            }
+            ans.push_back((int)cur);
+            if (backtrack(num, ans, i + 1))
+                return true;
+            ans.pop_back();
+        }
+        return false;
+    }
+};
