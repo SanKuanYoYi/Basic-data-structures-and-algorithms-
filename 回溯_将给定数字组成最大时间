@@ -1,0 +1,41 @@
+class Solution {
+public:
+    string largestTimeFromDigits(vector<int>& arr) {
+        string ans = "";
+        vector<bool> used(4, false);
+        vector<int> path(4);
+        backtrack(arr, ans, used, path, 0);
+        return ans;
+    }
+
+    void backtrack(vector<int>& arr, string& ans, vector<bool>& used,
+                   vector<int>& path, int pos) {
+        if (pos == 4) {
+            int hour = path[0] * 10 + path[1];
+            int minute = path[2] * 10 + path[3];
+            if (hour < 24 && minute < 60) {
+                string cur = to_string(hour / 10) + to_string(hour % 10) + ":" +
+                             to_string(minute / 10) + to_string(minute % 10);
+                if (ans.empty() || cur > ans)
+                    ans = cur;
+            }
+            return;
+        }
+        for (int i = 0; i < 4; ++i) {
+            if (used[i])
+                continue;
+            if (pos == 0 && arr[i] > 2)
+                continue;
+            if (pos == 1)
+                if (path[0] == 2 && arr[i] > 3)
+                    continue;
+
+            if (pos == 2 && arr[i] > 5)
+                continue;
+            used[i] = true;
+            path[pos] = arr[i];
+            backtrack(arr, ans, used, path, pos + 1);
+            used[i] = false;
+        }
+    };
+};
