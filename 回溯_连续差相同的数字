@@ -1,0 +1,51 @@
+/*
+class Solution {
+public:
+    vector<int> numsSameConsecDiff(int n, int k) {
+        vector<int> ans;
+        int start = pow(10, n - 1), end = pow(10, n) - 1;
+        for (int num = start; num <= end; num++) {
+            string s = to_string(num);
+            bool valid = true;
+            for (int i = 0; i < s.size() - 1; ++i) {
+                if (abs(s[i] - s[i + 1]) != k) {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid)
+                ans.push_back(num);
+        }
+        return ans;
+    }
+};
+*/
+
+class Solution {
+public:
+    vector<int> ans;
+
+    vector<int> numsSameConsecDiff(int n, int k) {
+        for (int i = 1; i <= 9; i++)
+            backtrack(i, n - 1, k, ans);
+        return ans;
+    }
+
+    void backtrack(int num, int remaining, int k, vector<int>& res) {
+        if (!remaining) {
+            ans.push_back(num);
+            return;
+        }
+        int last = num % 10;
+        int next1 = last + k;
+        if (next1 < 10)
+            backtrack(num * 10 + next1, remaining - 1, k, ans);
+
+        if (k != 0) {
+            int next2 = last - k;
+            if (next2 >= 0)
+                backtrack(num * 10 + next2, remaining - 1, k, res);
+        }
+    }
+};
+
