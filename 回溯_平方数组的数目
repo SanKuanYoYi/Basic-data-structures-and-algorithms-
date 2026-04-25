@@ -1,0 +1,37 @@
+class Solution {
+public:
+    int numSquarefulPerms(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<bool> used(nums.size(), false);
+        vector<int> path;
+        int ans = 0;
+        backtrack(nums, used, path, ans);
+        return ans;
+    }
+
+    bool isSquare(int x) {
+        int r = sqrt(x);
+        return r * r == x;
+    }
+
+    void backtrack(vector<int>& nums, vector<bool>& used, vector<int>& path,
+                   int& ans) {
+        if (path.size() == nums.size()) {
+            ans++;
+            return;
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            if (used[i])
+                continue;
+            if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1])
+                continue;
+            if (!path.empty() && !isSquare(path.back() + nums[i]))
+                continue;
+            used[i] = true;
+            path.push_back(nums[i]);
+            backtrack(nums, used, path, ans);
+            path.pop_back();
+            used[i] = false;
+        }
+    }
+};
