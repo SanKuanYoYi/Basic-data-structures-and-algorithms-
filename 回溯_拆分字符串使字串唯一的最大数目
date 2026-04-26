@@ -1,0 +1,29 @@
+class Solution {
+public:
+    int ans = 0;
+    unordered_set<string> record;
+
+    int maxUniqueSplit(string s) {
+        backtrack(s, 0, -1, 0);
+        return ans;
+    }
+
+    void backtrack(string& s, int cnt, int prev, int index) {
+        int n = s.size();
+        if (cnt + n - index <= ans)
+            return;
+        string cur = s.substr(prev + 1, index - prev);
+        bool valid = !record.count(cur);
+        if (index == n) {
+            if (valid)
+                ans = max(ans, cnt);
+            return;
+        }
+        if (valid) {
+            record.insert(cur);
+            backtrack(s, cnt + 1, index, index + 1);
+            record.erase(cur);
+        }
+        backtrack(s, cnt, prev, index + 1);
+    }
+};
