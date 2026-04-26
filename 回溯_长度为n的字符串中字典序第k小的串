@@ -1,0 +1,31 @@
+class Solution {
+public:
+    vector<char> happy = {'a', 'b', 'c'};
+    string res;
+    char prev;
+    int cnt = 0;
+
+    string getHappyString(int n, int k) {
+        string path;
+        backtrack(n, k, path, ' ');
+        return res;
+    }
+
+    void backtrack(int n, int k, string& path, char prev) {
+        if (path.length() == n) {
+            cnt++;
+            if (cnt == k)
+                res = path;
+            return;
+        }
+        for (char c : happy) {
+            if (c == prev)
+                continue;
+            path.push_back(c);
+            backtrack(n, k, path, c);
+            path.pop_back();
+            if (!res.empty())
+                return;
+        }
+    }
+};
