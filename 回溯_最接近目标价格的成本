@@ -1,0 +1,23 @@
+class Solution {
+public:
+    int ans = INT_MAX;
+
+    int closestCost(vector<int>& baseCosts, vector<int>& toppingCosts,
+                    int target) {
+        for (int base : baseCosts)
+            backtrack(toppingCosts, 0, base, target);
+        return ans;
+    }
+
+    void backtrack(vector<int>& toppingCosts, int index, int base, int target) {
+        if ((abs(base - target) < abs(ans - target)) ||
+            (abs(base - target) == abs(ans - target) && base < ans))
+            ans = base;
+        if (index == toppingCosts.size())
+            return;
+        backtrack(toppingCosts, index + 1, base, target);
+        backtrack(toppingCosts, index + 1, base + toppingCosts[index], target);
+        backtrack(toppingCosts, index + 1, base + 2 * toppingCosts[index],
+                  target);
+    }
+};
