@@ -1,0 +1,17 @@
+class Solution {
+public:
+    int wiggleMaxLength(vector<int>& nums) {
+        if (nums.size() < 2)
+            return nums.size();
+        int ans = 1, prevDiff = 0;
+        for (int i = 1; i < nums.size(); ++i) {
+            int curDiff = nums[i] - nums[i - 1];
+            if ((curDiff > 0 && prevDiff <= 0) ||
+                (curDiff < 0 && prevDiff >= 0)) {
+                ++ans;
+                prevDiff = curDiff;
+            }
+        }
+        return ans;
+    }
+};
