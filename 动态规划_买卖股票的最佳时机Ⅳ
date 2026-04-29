@@ -1,0 +1,19 @@
+class Solution {
+public:
+    int maxProfit(int k, vector<int>& prices) {
+        int n = prices.size();
+        if (n < 2 || k == 0)
+            return 0;
+
+        vector<int> dp(k + 1, 0);
+        vector<int> minCost(k + 1, INT_MAX);
+
+        for (int p : prices) {
+            for (int i = 1; i <= k; i++) {
+                minCost[i] = min(minCost[i], p - dp[i - 1]);
+                dp[i] = max(dp[i], p - minCost[i]);
+            }
+        }
+        return dp[k];
+    }
+};
