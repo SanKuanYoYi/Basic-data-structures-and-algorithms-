@@ -1,0 +1,43 @@
+class Solution {
+public:
+    /*
+        int jump(vector<int>& nums) {
+            int n = nums.size();
+            if (n <= 1)
+                return 0;
+
+            int ans = 0;
+            int next = 0;
+            int sectMax = 0;
+
+            for (int i = 0; i < n - 1; i++) {
+                sectMax = max(sectMax, i + nums[i]);
+                if (i == next) {
+                    ans++;
+                    next = sectMax;
+                    if (next >= n - 1)
+                        return ans;
+                }
+            }
+            return ans;
+        }
+    */
+
+    int jump(vector<int>& nums) {
+        int n = nums.size();
+        if (n <= 1)
+            return 0;
+        int steps = 0;
+        int left = 0, right = 0;
+        while (right < n - 1) {
+            int maxReach = 0;
+            for (int i = left; i <= right; ++i) {
+                maxReach = max(maxReach, i + nums[i]);
+            }
+            left = right + 1;
+            right = maxReach;
+            ++steps;
+        }
+        return steps;
+    }
+};
