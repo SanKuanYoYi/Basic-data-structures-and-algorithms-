@@ -1,0 +1,30 @@
+class Solution {
+public:
+    int largestSumAfterKNegations(vector<int>& nums, int k) {
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        int ans = 0;
+        int index = 0;
+
+        while (index < n && k > 0 && nums[index] < 0) {
+            nums[index] = -nums[index];
+            index++;
+            k--;
+        }
+
+        if (k % 2 == 1) {
+            if (index == 0)
+                nums[0] = -nums[0];
+            else if (index == n)
+                nums[n - 1] = -nums[n - 1];
+            else {
+                index = (nums[index] < nums[index - 1]) ? index : index - 1;
+                nums[index] = -nums[index];
+            }
+        }
+
+        for (int x : nums)
+            ans += x;
+        return ans;
+    }
+};
