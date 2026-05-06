@@ -1,0 +1,19 @@
+class Solution {
+public:
+    vector<int> partitionLabels(string s) {
+        int lastPos[26];
+        int n = s.length();
+        for (int i = 0; i < n; i++)
+            lastPos[s[i] - 'a'] = i;
+        vector<int> ans;
+        int left = 0, right = 0;
+        for (int i = 0; i < n; i++) {
+            right = max(right, lastPos[s[i] - 'a']);
+            if (i == right) {
+                ans.emplace_back(right - left + 1);
+                left = right + 1;
+            }
+        }
+        return ans;
+    }
+};
