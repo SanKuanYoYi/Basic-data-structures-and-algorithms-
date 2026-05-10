@@ -1,0 +1,28 @@
+class Solution {
+public:
+    vector<string> wordBreak(string s, vector<string>& wordDict) {
+        unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
+        return dfs(s, 0, wordSet);
+    }
+
+    vector<string> dfs(string s, int start, unordered_set<string>& wordSet) {
+        vector<string> res;
+        if (start == s.length()) {
+            res.push_back("");
+            return res;
+        }
+        for (int end = start + 1; end <= s.length(); end++) {
+            string word = s.substr(start, end - start);
+            if (wordSet.count(word)) {
+                vector<string> sub = dfs(s, end, wordSet);
+                for (auto& ss : sub) {
+                    if (ss.empty())
+                        res.emplace_back(word);
+                    else
+                        res.emplace_back(word + " " + ss);
+                }
+            }
+        }
+        return res;
+    }
+};
