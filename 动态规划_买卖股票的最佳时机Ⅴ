@@ -1,0 +1,82 @@
+/*
+class Solution {
+public:
+    long long maximumProfit(vector<int>& prices, int k) {
+        int n = prices.size();
+        if (n <= 1 || !k)
+            return 0;
+        vector<vector<vector<long long>>> dp(
+            n + 1,
+            vector<vector<long long>>(k + 1, vector<long long>(3, -1e18)));
+        dp[1][0][0] = 0;          // 空仓，未交易
+        dp[1][0][1] = -prices[0]; // 做多买入（支付价格）
+        dp[1][0][2] = prices[0];  // 做空卖出（获得现金）
+        for (int i = 2; i <= n; i++) {
+            for (int j = 0; j <= k; j++) {
+                dp[i][j][0] =
+                    max({dp[i - 1][j][0], dp[i - 1][j][1] + prices[i - 1],
+                         dp[i - 1][j][2] - prices[i - 1]});
+                dp[i][j][1] = dp[i - 1][j][1];
+                if (j >= 1) {
+                    dp[i][j][1] = max(dp[i - 1][j][1],
+                                      dp[i - 1][j - 1][0] - prices[i - 1]);
+                }
+                dp[i][j][2] = dp[i - 1][j][2];
+                if (j >= 1) {
+                    dp[i][j][2] = max(dp[i - 1][j][2],
+                                      dp[i - 1][j - 1][0] + prices[i - 1]);
+                }
+            }
+        }
+        long long ans = 0;
+        for (int j = 0; j <= k; j++)
+            ans = max(ans, dp[n][j][0]);
+        return ans;
+    }
+};
+*/
+
+class Solution {
+public:
+    long long maximumProfit(vector<int>& prices, int k) {
+        int n = prices.size();
+        if (n <= 1 || k == 0)
+            return 0;
+        const long long NEG = -1e18;
+        // dp[i][j][state]: i 天 (0~n), j 已完成交易次数 (0~k), state
+        // 0空仓,1做多持仓,2做空持仓
+        vector<vector<vector<long long>>> dp(
+            n + 1, vector<vector<long long>>(k + 1, vector<long long>(3, NEG)));
+        // 第 0 天（未开始）: 空仓，已完成 0 次交易，利润 0
+        dp[0][0][0] = 0;
+        for (int i = 1; i <= n; ++i) {
+            int p = prices[i - 1];
+            for (int j = 0; j <= k; ++j) {
+                // 空仓状态 (0)
+                // 继承前一天的空仓、平多仓（卖出）、平空仓（买回）
+                long long keep0 = dp[i - 1][j][0];
+                long long fromLong =
+                    (j > 0) ? dp[i - 1][j - 1][1] + p : NEG; // 卖出完成一笔交易
+                long long fromShort = (j > 0) ? dp[i - 1][j - 1][2] - p
+                                              : NEG; // 买回平空仓完成一笔交易
+                dp[i][j][0] = max({keep0, fromLong, fromShort});
+
+                // 做多持仓 (1)
+                // 继承前一天的多仓、从空仓买入（不增加交易次数）
+                long long keep1 = dp[i - 1][j][1];
+                long long fromBuy = dp[i - 1][j][0] - p;
+                dp[i][j][1] = max(keep1, fromBuy);
+
+                // 做空持仓 (2)
+                // 继承前一天的做空仓、从空仓融券卖出（不增加交易次数）
+                long long keep2 = dp[i - 1][j][2];
+                long long fromSellShort = dp[i - 1][j][0] + p;
+                dp[i][j][2] = max(keep2, fromSellShort);
+            }
+        }
+        long long ans = 0;
+        for (int j = 0; j <= k; ++j)
+            ans = max(ans, dp[n][j][0]);
+        return ans;
+    }
+};
