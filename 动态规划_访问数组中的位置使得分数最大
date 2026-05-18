@@ -1,0 +1,21 @@
+class Solution {
+public:
+    long long maxScore(vector<int>& nums, int x) {
+        int n = nums.size();
+        long long maxEven = (nums[0] % 2 == 0) ? nums[0] : -1e9;
+        long long maxOdd = (nums[0] % 2 == 1) ? nums[0] : -1e9;
+        for (int i = 1; i < n; ++i) {
+            if (nums[i] % 2 == 0) {
+                long long newEven =
+                    max(maxEven + nums[i], maxOdd + nums[i] - x);
+                maxOdd = maxOdd;
+                maxEven = newEven;
+            } else {
+                long long newOdd = max(maxOdd + nums[i], maxEven + nums[i] - x);
+                maxEven = maxEven;
+                maxOdd = newOdd;
+            }
+        }
+        return max(maxEven, maxOdd);
+    }
+};
