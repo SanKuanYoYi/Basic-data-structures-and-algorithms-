@@ -1,0 +1,23 @@
+class Solution {
+public:
+    int getMoneyAmount(int n) {
+        if (n == 1)
+            return 0;
+        vector<vector<long long>> dp(n + 1, vector<long long>(n + 1, INT_MAX));
+        // dp[i][j] 表示在区间 [i, j] 内猜中数字的最小花费
+        for (int i = 0; i <= n; i++)
+            dp[i][i] = 0;
+        for (int len = 2; len <= n; len++) {
+            for (int i = 1; i + len - 1 <= n; i++) {
+                int j = i + len - 1;
+                for (int k = i; k <= j; k++) {
+                    int left = (k > i) ? dp[i][k - 1] : 0;
+                    int right = (k < j) ? dp[k + 1][j] : 0;
+                    int cost = k + max(left, right);
+                    dp[i][j] = min((int)dp[i][j], cost);
+                }
+            }
+        }
+        return (int)dp[1][n];
+    }
+};
