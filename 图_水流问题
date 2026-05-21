@@ -1,0 +1,104 @@
+/*
+class Solution {
+public:
+    vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+        int n = heights.size(), m = heights[0].size();
+        vector<vector<int>> res;
+        int dirs[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+        auto canPacific = [&](int x, int y) {
+            vector<vector<bool>> visited(n, vector<bool>(m, false));
+            queue<pair<int, int>> q;
+            q.push({x, y});
+            visited[x][y] = true;
+            while (!q.empty()) {
+                auto [cx, cy] = q.front();
+                q.pop();
+                if (cx == 0 || cy == 0)
+                    return true;
+                for (auto& d : dirs) {
+                    int nx = cx + d[0], ny = cy + d[1];
+                    if (nx >= 0 && nx < n && ny >= 0 && ny < m &&
+                        !visited[nx][ny] &&
+                        heights[nx][ny] <= heights[cx][cy]) {
+                        visited[nx][ny] = true;
+                        q.push({nx, ny});
+                    }
+                }
+            }
+            return false;
+        };
+
+        auto canAtlantic = [&](int x, int y) {
+            vector<vector<bool>> visited(n, vector<bool>(m, false));
+            queue<pair<int, int>> q;
+            q.push({x, y});
+            visited[x][y] = true;
+            while (!q.empty()) {
+                auto [cx, cy] = q.front();
+                q.pop();
+                if (cx == n - 1 || cy == m - 1)
+                    return true;
+                for (auto& d : dirs) {
+                    int nx = cx + d[0], ny = cy + d[1];
+                    if (nx >= 0 && nx < n && ny >= 0 && ny < m &&
+                        !visited[nx][ny] &&
+                        heights[nx][ny] <= heights[cx][cy]) {
+                        visited[nx][ny] = true;
+                        q.push({nx, ny});
+                    }
+                }
+            }
+            return false;
+        };
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (canPacific(i, j) && canAtlantic(i, j)) {
+                    res.push_back({i, j});
+                }
+            }
+        }
+        return res;
+    }
+};
+*/
+class Solution {
+public:
+    int dirs[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+        int n = heights.size(), m = heights[0].size();
+        vector<vector<bool>> pac(n, vector<bool>(m, false));
+        vector<vector<bool>> atl(n, vector<bool>(m, false));
+
+        for (int i = 0; i < n; ++i) {
+            dfs(i, 0, pac, heights);
+            dfs(i, m - 1, atl, heights);
+        }
+        for (int j = 0; j < m; ++j) {
+            dfs(0, j, pac, heights);
+            dfs(n - 1, j, atl, heights);
+        }
+
+        vector<vector<int>> ans;
+        for (int i = 0; i < n; ++i)
+            for (int j = 0; j < m; ++j)
+                if (pac[i][j] && atl[i][j])
+                    ans.push_back({i, j});
+        return ans;
+    }
+
+    void dfs(int x, int y, vector<vector<bool>>& ocean,
+             vector<vector<int>>& heights) {
+        int n = heights.size(), m = heights[0].size();
+        ocean[x][y] = true;
+        for (auto& d : dirs) {
+            int nx = x + d[0], ny = y + d[1];
+            if (nx >= 0 && nx < n && ny >= 0 && ny < m && !ocean[nx][ny] &&
+                heights[nx][ny] >= heights[x][y]) {
+                dfs(nx, ny, ocean, heights);
+            }
+        }
+    }
+};
