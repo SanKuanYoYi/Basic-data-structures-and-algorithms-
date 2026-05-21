@@ -1,0 +1,40 @@
+class Solution {
+public:
+    int numIsolatedOnes(vector<vector<int>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+        if (n == 0 || m == 0) return 0;
+        
+        vector<vector<bool>> toZero(n, vector<bool>(m, false));
+        int total = 0;  // 孤岛总面积（即个数）
+        
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (grid[i][j] == 1) {
+                    bool hasNeighbor = false;
+                    // 检查四个方向是否有相邻的1
+                    if (i > 0 && grid[i-1][j] == 1) hasNeighbor = true;
+                    if (i < n-1 && grid[i+1][j] == 1) hasNeighbor = true;
+                    if (j > 0 && grid[i][j-1] == 1) hasNeighbor = true;
+                    if (j < m-1 && grid[i][j+1] == 1) hasNeighbor = true;
+                    
+                    if (hasNeighbor) {
+                        toZero[i][j] = true;   // 属于非孤岛，待清除
+                    } else {
+                        total++;               // 孤岛，计数+1
+                    }
+                }
+            }
+        }
+        
+        // 将所有非孤岛的区域变成 0
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (toZero[i][j]) {
+                    grid[i][j] = 0;
+                }
+            }
+        }
+        
+        return total;
+    }
+};
