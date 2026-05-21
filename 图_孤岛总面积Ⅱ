@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int isolatedToZero(vector<vector<int>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+        if (n == 0 || m == 0) return 0;
+        
+        vector<vector<bool>> hasNeighbor(n, vector<bool>(m, false));
+        
+        // 第一遍：标记有相邻 1 的格子（非孤岛）
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (grid[i][j] == 1) {
+                    if ((i > 0 && grid[i-1][j] == 1) ||
+                        (i < n-1 && grid[i+1][j] == 1) ||
+                        (j > 0 && grid[i][j-1] == 1) ||
+                        (j < m-1 && grid[i][j+1] == 1)) {
+                        hasNeighbor[i][j] = true;
+                    }
+                }
+            }
+        }
+        
+        // 第二遍：孤岛（无相邻 1）变 0，并统计个数
+        int isolatedCount = 0;
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (grid[i][j] == 1 && !hasNeighbor[i][j]) {
+                    grid[i][j] = 0;
+                    isolatedCount++;
+                }
+            }
+        }
+        return isolatedCount;  // 返回孤岛总面积（个数）
+    }
+};
