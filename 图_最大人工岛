@@ -1,0 +1,52 @@
+class Solution {
+public:
+    int dirs[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    int largestIsland(vector<vector<int>>& grid) {
+        int n = grid.size(), m = grid[0].size();
+        vector<int> area = {0, 0}; // area[2]开始存储，下标对应岛屿编号
+        int islandId = 2;          // 岛屿编号从2开始，避免与0/1冲突
+        int maxExisting = 0;       // 不填海时的最大岛屿面积
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (grid[i][j] == 1) {
+                    int s = dfs(grid, i, j, n, m, islandId);
+                    area.push_back(s);
+                    maxExisting = max(maxExisting, s);
+                    islandId++;
+                }
+            }
+        }
+
+        int res = maxExisting; // 至少保留原有最大岛
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (grid[i][j] == 0) {
+                    unordered_set<int> ids;
+                    for (auto& d : dirs) {
+                        int ni = i + d[0], nj = j + d[1];
+                        if (ni >= 0 && ni < n && nj >= 0 && nj < m &&
+                            grid[ni][nj] > 1)
+                            ids.insert(grid[ni][nj]);
+                    }
+                    int cur = 1;
+                    for (int id : ids)
+                        cur += area[id];
+                    res = max(res, cur);
+                }
+            }
+        }
+        return res;
+    }
+
+    int dfs(vector<vector<int>>& grid, int x, int y, int n, int m, int id) {
+        if (x < 0 || x >= n || y < 0 || y >= m || grid[x][y] != 1)
+            return 0;
+        grid[x][y] = id;
+        int area = 1;
+        for (auto& d : dirs)
+            area += dfs(grid, x + d[0], y + d[1], n, m, id);
+        return area;
+    }
+};
