@@ -1,0 +1,70 @@
+class Solution {
+public:
+    vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges) {
+        int n = edges.size();
+        vector<int> indeg(n + 1, 0);
+        // 统计入度，并记录入度为2的节点
+        vector<int> inEqualTwo;
+        for (auto& e : edges) {
+            indeg[e[1]]++;
+            if (indeg[e[1]] == 2) {
+                inEqualTwo.push_back(e[1]);
+            }
+        }
+
+        // 情况1：存在入度为2的节点（最多一个）
+        if (!inEqualTwo.empty()) {
+            int node2 = inEqualTwo[0]; // 入度为2的节点
+            vector<vector<int>> candidates;
+            for (auto& e : edges) {
+                if (e[1] == node2)
+                    candidates.push_back(e);
+            }
+            // candidates[0]先出现，candidates[1]后出现
+            if (isTreeAfterRemove(edges, candidates[1], n))
+                return candidates[1];
+            else
+                return candidates[0];
+        }
+
+        // 情况2：没有入度为2的节点 -> 一定有环，找环边（类似684）
+        vector<int> parent(n + 1);
+        for (int i = 1; i <= n; ++i)
+            parent[i] = i;
+        for (auto& e : edges) {
+            int u = e[0], v = e[1];
+            if (find(parent, u) == find(parent, v))
+                return e;
+            unionSet(parent, u, v);
+        }
+        return {};
+    }
+
+    bool isTreeAfterRemove(vector<vector<int>>& edges, vector<int>& removeEdge,
+                           int n) {
+        vector<int> parent(n + 1);
+        for (int i = 1; i <= n; ++i)
+            parent[i] = i;
+        for (auto& e : edges) {
+            if (e == removeEdge)
+                continue;
+            int u = e[0], v = e[1];
+            if (find(parent, u) == find(parent, v))
+                return false;
+            unionSet(parent, u, v);
+        }
+        return true;
+    }
+
+    int find(vector<int>& parent, int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent, parent[x]);
+        return parent[x];
+    }
+
+    void unionSet(vector<int>& parent, int x, int y) {
+        int rx = find(parent, x), ry = find(parent, y);
+        if (rx != ry)
+            parent[rx] = ry;
+    }
+};
