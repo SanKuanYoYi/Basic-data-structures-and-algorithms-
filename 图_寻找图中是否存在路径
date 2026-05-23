@@ -1,0 +1,60 @@
+/*
+class Solution {
+public:
+    bool validPath(int n, vector<vector<int>>& edges, int source,
+                   int destination) {
+        vector<vector<int>> graph(n);
+        for (auto& edge : edges) {
+            graph[edge[0]].push_back(edge[1]);
+            graph[edge[1]].push_back(edge[0]);
+        }
+
+        vector<bool> visited(n, false);
+        queue<int> q;
+        q.push(source);
+        visited[source] = true;
+
+        while (!q.empty()) {
+            int cur = q.front();
+            q.pop();
+            if (cur == destination)
+                return true;
+            for (int next : graph[cur])
+                if (!visited[next]) {
+                    visited[next] = true;
+                    q.push(next);
+                }
+        }
+        return false;
+    }
+};
+*/
+
+class Solution {
+public:
+    vector<int> parent;
+
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]);
+        return parent[x];
+    }
+
+    void unite(int x, int y) {
+        int rx = find(x), ry = find(y);
+        if (rx != ry)
+            parent[rx] = ry;
+    }
+
+    bool validPath(int n, vector<vector<int>>& edges, int source,
+                   int destination) {
+        parent.resize(n);
+        for (int i = 0; i < n; i++)
+            parent[i] = i;
+
+        for (auto& edge : edges)
+            unite(edge[0], edge[1]);
+
+        return find(source) == find(destination);
+    }
+};
