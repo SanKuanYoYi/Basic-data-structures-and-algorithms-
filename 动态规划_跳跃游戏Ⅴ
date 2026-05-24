@@ -1,0 +1,23 @@
+class Solution {
+public:
+    int maxJumps(vector<int>& arr, int d) {
+        int n = arr.size();
+        vector<pair<int, int>> record;
+        vector<int> dp(n, 1);
+        int res = 1;
+        for (int i = 0; i < n; i++)
+            record.push_back({arr[i], i});
+        sort(record.begin(), record.end());
+        for (int i = 0; i < n; i++) {
+            int index = record[i].second;
+            for (int j = index - 1; j >= max(0, index - d) && arr[j] < arr[index];
+                 j--)
+                dp[index] = max(dp[index], dp[j] + 1);
+            for (int j = index + 1;
+                 j <= min(n - 1, index + d) && arr[j] < arr[index]; j++)
+                dp[index] = max(dp[index], dp[j] + 1);
+            res = max(dp[index], res);
+        }
+        return res;
+    }
+};
