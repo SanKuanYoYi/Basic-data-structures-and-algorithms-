@@ -1,0 +1,46 @@
+/*
+class Solution {
+public:
+    bool canReach(string s, int minJump, int maxJump) {
+        int n = s.size();
+        vector<bool> dp(n, false);
+        dp[0] = true;
+        for (int i = 0; i < n; i++) {
+            if (!dp[i])
+                continue;
+            for (int j = i + minJump; j <= min(i + maxJump, n - 1); j++) {
+                if (s[j] == '0')
+                    dp[j] = true;
+            }
+        }
+        return dp[n - 1];
+    }
+};
+*/
+
+class Solution {
+public:
+    bool canReach(string s, int minJump, int maxJump) {
+        int n = s.size();
+        vector<bool> dp(n, false);
+        vector<int> prefix(n, 0);
+        // prefix[i] 表示 index [0, i] 区间内 dp 为真的数量
+        dp[0] = true;
+        prefix[0] = 1;
+        for (int i = 1; i < n; i++) {
+            if (s[i] == '0') {
+                int left = i - maxJump, right = i - minJump;
+                if (right < 0)
+                    dp[i] = false;
+                else {
+                    left = left > 0 ? left : 0;
+                    int possible =
+                        prefix[right] - (left > 0 ? prefix[left - 1] : 0);
+                    dp[i] = possible > 0 ? true : false;
+                }
+            }
+            prefix[i] = prefix[i - 1] + (dp[i] ? 1 : 0);
+        }
+        return dp[n - 1];
+    }
+};
