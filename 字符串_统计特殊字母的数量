@@ -1,0 +1,31 @@
+/*
+class Solution {
+public:
+    int numberOfSpecialChars(string word) {
+        unordered_set<char> lowerSet, upperSet;
+        for (char c : word) {
+            if (islower(c))
+                lowerSet.insert(c);
+            else
+                upperSet.insert(c);
+        }
+        int ans = 0;
+        for (char c : lowerSet) {
+            if (upperSet.count(toupper(c)))
+                ans++;
+        }
+        return ans;
+    }
+};
+*/
+class Solution {
+public:
+    int numberOfSpecialChars(string word) {
+        unordered_set<char> record(word.begin(), word.end());
+        int ans = 0;
+        for (char c = 'a'; c <= 'z'; c++)
+            if (record.count(c) && record.count(c - 'a' + 'A'))
+                ans++;
+        return ans;
+    }
+};
