@@ -1,0 +1,54 @@
+/*
+class Solution {
+public:
+    int numberOfSpecialChars(string word) {
+        int ans = 0;
+        unordered_set<char> lower;
+        unordered_set<char> upper;
+        unordered_map<char, int> lowerIdx;
+        unordered_map<char, int> upperIdx;
+        int n = word.size();
+        for (int i = 0; i < n; i++) {
+            if (islower(word[i]))
+                lower.insert(word[i]), lowerIdx[word[i]] = i;
+            else {
+                upper.insert(word[i]);
+                if (upperIdx.find(word[i]) == upperIdx.end())
+                    upperIdx[word[i]] = i;
+            }
+        }
+        for (char c : lower) {
+            char upperC = toupper(c);
+            if (upper.find(upperC) != upper.end() &&
+                lowerIdx[c] < upperIdx[upperC])
+                ++ans;
+        }
+        return ans;
+    }
+};
+*/
+class Solution {
+public:
+    int numberOfSpecialChars(string word) {
+        vector<int> lastLower(26, -1);
+        vector<int> firstUpper(26, -1);
+        int n = word.size();
+        for (int i = 0; i < n; ++i) {
+            char c = word[i];
+            if (islower(c)) {
+                lastLower[c - 'a'] = i;
+            } else if (isupper(c)) {
+                int idx = c - 'A';
+                if (firstUpper[idx] == -1)
+                    firstUpper[idx] = i; 
+            }
+        }
+        int ans = 0;
+        for (int i = 0; i < 26; ++i) {
+            if (lastLower[i] != -1 && firstUpper[i] != -1 &&
+                lastLower[i] < firstUpper[i])
+                ++ans;
+        }
+        return ans;
+    }
+};
