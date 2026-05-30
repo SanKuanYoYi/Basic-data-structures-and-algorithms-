@@ -1,0 +1,451 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <numeric>
+#include <algorithm>
+
+class GraphMatrix {
+
+private:
+	int vertexNum; // 顶点数
+	std::vector<std::vector<int>> matrix; // 邻接矩阵
+	bool directed; // 是否有向图
+
+public:
+	GraphMatrix(int n, bool directed) :vertexNum(n), directed(directed) {
+		matrix.resize(vertexNum, std::vector<int>(vertexNum, 0));
+	}
+
+	void addEdge(int u, int v, int weight = 1) {
+		if(u>=vertexNum || v>=vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return;
+		}
+		matrix[u][v] = weight;
+		if(!directed) {
+			matrix[v][u] = weight;
+		}
+	}
+
+	void removeEdge(int u, int v) {
+		if(u>=vertexNum || v>=vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return;
+		}
+		matrix[u][v] = 0;
+		if(!directed) {
+			matrix[v][u] = 0;
+		}
+	}
+
+	void addVertex() {
+		vertexNum++;
+		matrix.resize(vertexNum);
+		for(auto& row : matrix) {
+			row.resize(vertexNum, 0);
+		}
+	}
+
+	bool hasEdge(int u, int v) {
+		if(u>=vertexNum || v>=vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return false;
+		}
+		return matrix[u][v] != 0;
+	}
+
+	std::vector<int> getNeighbors(int u) {
+		std::vector<int> neighbors;
+		if(u>=vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return neighbors;
+		}
+		for(int v = 0; v < vertexNum; v++) {
+			if(matrix[u][v] != 0) {
+				neighbors.push_back(v);
+			}
+		}
+		return neighbors;
+	}
+
+	void printGraph() {
+		for(int i = 0; i < vertexNum; i++) {
+			for(int j = 0; j < vertexNum; j++) {
+				std::cout << matrix[i][j] << " ";
+			}
+			std::cout << std::endl;
+		}
+	}
+
+	void bfs(int start) {
+		if(start >= vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return;
+		}
+		std::vector<bool> visited(vertexNum, false);
+		std::queue<int> q;
+		q.push(start);
+		visited[start] = true;
+		while(!q.empty()) {
+			int u = q.front();
+			q.pop();
+			std::cout << "Visited vertex: " << u << std::endl;
+			for(int v = 0; v < vertexNum; v++) {
+				if(matrix[u][v] != 0 && !visited[v]) {
+					q.push(v);
+					visited[v] = true;
+				}
+			}
+		}
+	}	
+
+	void dfs(int start, std::vector<bool>& visited) {
+		if(start >= vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return;
+		}
+		visited[start] = true;
+		std::cout << "Visited vertex: " << start << std::endl;
+		for(int v = 0; v < vertexNum; v++) {
+			if(matrix[start][v] != 0 && !visited[v]) {
+				dfs(v, visited);
+			}
+		}
+	}
+	void dfs(int start) {
+		std::vector<bool> visited(vertexNum, false);
+		dfs(start, visited);
+	}
+
+	int primMst() const {
+		const int INF = 1e9;
+		std::vector<bool> visited(vertexNum, false);
+		std::vector<int> minDist(vertexNum, INF);
+		minDist[0] = 0;
+		int total = 0;
+
+		for (int i = 0; i < vertexNum; ++i) {
+			int u = -1;
+			for (int j = 0; j < vertexNum; ++j)
+				if (!visited[j] && (u == -1 || minDist[j] < minDist[u]))
+					u = j;
+			if (minDist[u] == INF) return -1;
+			visited[u] = true;
+			total += minDist[u];
+			for (const auto& edge : matrix[u]) {
+				int v = &edge - &matrix[u][0];
+				int weight = edge;
+				if (!visited[v] && weight != 0 && weight < minDist[v])
+					minDist[v] = weight;
+			}
+		}
+		return total;
+	}
+};
+
+/// ///////////////////////////////////////////////////////////////////////////
+
+class GraphList {
+private:
+	int vertexNum; // 顶点数
+	std::vector<std::vector<std::pair<int, int>>> adjList; // 邻接表
+	bool directed; // 是否有向图
+
+public:
+	GraphList(int n, bool directed) :vertexNum(n), directed(directed) {
+		adjList.resize(vertexNum);
+	}
+
+	void addEdge(int u, int v, int weight = 1) {
+		if(u>=vertexNum || v>=vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return;
+		}
+		adjList[u].push_back({v, weight});
+		if(!directed) {
+			adjList[v].push_back({u, weight});
+		}
+	}
+
+	void removeEdge(int u, int v) {
+		if(u>=vertexNum || v>=vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return;
+		}
+		auto& edges = adjList[u];
+		for(auto it = edges.begin(); it != edges.end(); ++it) {
+			if(it->first == v) {
+				edges.erase(it);
+				break;
+			}
+		}
+		if(!directed) {
+			auto& reverseEdges = adjList[v];
+			for(auto it = reverseEdges.begin(); it != reverseEdges.end(); ++it) {
+				if(it->first == u) {
+					reverseEdges.erase(it);
+					break;
+				}
+			}
+		}
+	}
+
+	void addVertex() {
+		vertexNum++;
+		adjList.resize(vertexNum);
+	}
+
+	bool hasEdge(int u, int v) {
+		if(u>=vertexNum || v>=vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return false;
+		}
+		for(const auto& edge : adjList[u]) {
+			if(edge.first == v) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	std::vector<int> getNeighbors(int u) {
+		std::vector<int> neighbors;
+		if(u>=vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return neighbors;
+		}
+		for(const auto& edge : adjList[u]) {
+			 neighbors.push_back(edge.first);
+		}
+		return neighbors;
+	}
+
+	void printGraph() {
+		for(int i = 0; i < vertexNum; i++) {
+			std::cout << "Vertex " << i << ": ";
+			for(const auto& edge : adjList[i]) {
+				std::cout << "(" << edge.first << ", weight: " << edge.second << ") ";
+			}
+			std::cout << std::endl;
+		}
+	}
+
+	void bfs(int start) {
+		if(start >= vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return;
+		}
+		std::vector<bool> visited(vertexNum, false);
+		std::queue<int> q;
+		q.push(start);
+		visited[start] = true;
+		while(!q.empty()) {
+			int u = q.front();
+			q.pop();
+			std::cout << "Visited vertex: " << u << std::endl;
+			for(const auto& edge : adjList[u]) {
+				int v = edge.first;
+				if(!visited[v]) {
+					q.push(v);
+					visited[v] = true;
+				}
+			}
+		}
+	}
+
+	void dfs(int start, std::vector<bool>& visited) {
+		if(start >= vertexNum) {
+			std::cerr << "Error: Vertex index out of bounds." << std::endl;
+			return;
+		}
+		visited[start] = true;
+		std::cout << "Visited vertex: " << start << std::endl;
+		for(const auto& edge : adjList[start]) {
+			int v = edge.first;
+			if(!visited[v]) {
+				dfs(v, visited);
+			}
+		}
+	}
+	void dfs(int start) {
+		std::vector<bool> visited(vertexNum, false);
+		dfs(start, visited);
+	}
+
+	int primMst() const {
+		const int INF = 1e9;
+		std::vector<bool> visited(vertexNum, false);
+		std::vector<int> minDist(vertexNum, INF);
+		minDist[0] = 0;
+		int total = 0;
+
+		for (int i = 0; i < vertexNum; ++i) {
+			int u = -1;
+			for (int j = 0; j < vertexNum; ++j)
+				if (!visited[j] && (u == -1 || minDist[j] < minDist[u]))
+					u = j;
+			if (minDist[u] == INF) return -1;
+			visited[u] = true;
+			total += minDist[u];
+			for (auto& list : adjList[u]) {
+				int v = list.first;
+				int weight = list.second;
+				if (!visited[v] && weight < minDist[v])
+					minDist[v] = weight;
+			}
+		}
+		return total;
+	}
+};
+
+class DSU {
+private:
+
+	std::vector<int>parent;
+	std::vector<int>rank;
+	std::vector<int>size;
+	int setCount;
+
+public:
+
+	DSU(int n) :parent(n), rank(n, 0), size(n, 1), setCount(n) {
+		std::iota(parent.begin(), parent.end(), 0);
+	}
+
+	int find(int x) {
+		if (parent[x] != x)
+			parent[x] = find(parent[x]);
+		return parent[x];
+	}
+
+	int find_iter(int x) {
+		int root = x;
+		while (parent[root] != root)
+			root = parent[root];
+		while (x != root) {
+			int next = parent[x];
+			parent[x] = root;
+			x = next;
+		}
+		return root;
+	}
+
+	bool unionSets(int x, int y) {
+		int rx = find(x), ry = find(y);
+		if (rx == ry)
+			return false;
+		if (rank[rx] < rank[ry]) {
+			parent[rx] = ry;
+			size[ry] += size[rx];
+		}
+		else if (rank[rx] > rank[ry]) {
+			parent[ry] = rx;
+			size[rx] += size[ry];
+		}
+		else {
+			parent[ry] = rx;
+			rank[rx]++;
+			size[rx] += size[ry];
+		}
+		setCount--;
+		return true;
+	}
+
+	int getSize(int x) {
+		return size[find(x)];
+	}
+
+	bool connected(int x, int y) {
+		return find(x) == find(y);
+	}
+
+	int countSets() {
+		return setCount;
+	}
+};
+
+int kruskal_mst(int n, std::vector<std::tuple<int, int, int>>& edges) {
+	std::sort(edges.begin(), edges.end(), [](const std::tuple<int, int, int>& a, const std::tuple<int, int, int>& b) {
+		return std::get<2>(a) < std::get<2>(b);
+	});
+	DSU dsu(n);
+	int mstWeight = 0;
+	for (const auto& edge : edges) {
+		int u = std::get<0>(edge);
+		int v = std::get<1>(edge);
+		int weight = std::get<2>(edge);
+		if (dsu.unionSets(u, v)) {
+			mstWeight += weight;
+		}
+	}
+	return mstWeight;
+}
+
+int main() {
+
+	GraphMatrix graphMatrix(5, false);
+	graphMatrix.addEdge(0, 1);
+	graphMatrix.addEdge(0, 2);
+	graphMatrix.addEdge(1, 3);
+	graphMatrix.addEdge(2, 4);
+	std::cout << "Graph represented as an adjacency matrix:" << std::endl;
+	graphMatrix.printGraph();
+	std::cout << "BFS starting from vertex 0:" << std::endl;
+	graphMatrix.bfs(0);
+	std::cout << "DFS starting from vertex 0:" << std::endl;
+	graphMatrix.dfs(0);
+
+
+	GraphList graphList(5, false);
+	graphList.addEdge(0, 1);
+	graphList.addEdge(0, 2);
+	graphList.addEdge(1, 3);
+	graphList.addEdge(2, 4);
+	std::cout << "Graph represented as an adjacency list:" << std::endl;
+	graphList.printGraph();
+	std::cout << "BFS starting from vertex 0:" << std::endl;
+	graphList.bfs(0);
+	std::cout << "DFS starting from vertex 0:" << std::endl;
+	graphList.dfs(0);
+
+
+	std::cout << "\nTesting Disjoint Set Union (DSU):" << std::endl;
+
+	DSU dsu(10);
+	dsu.unionSets(0, 1);
+	dsu.unionSets(2, 3);
+	dsu.unionSets(3, 4);
+
+	std::cout << dsu.connected(0, 1) << std::endl; // true
+	std::cout << dsu.connected(1, 2) << std::endl; // false
+	std::cout << dsu.getSize(2) << std::endl; // 3
+	std::cout << dsu.countSets() << std::endl; // 8
+
+	dsu.unionSets(4, 5);
+	dsu.unionSets(6, 7);
+	dsu.unionSets(5, 6);
+
+	std::cout << dsu.connected(4, 7) << std::endl; // true
+	std::cout << dsu.getSize(5) << std::endl; // 4
+	std::cout << dsu.countSets() << std::endl; // 6
+
+	std::cout << "\nTesting Prim's algorithm for Minimum Spanning Tree (MST):" << std::endl;
+	std::vector<std::vector<std::pair<int, int>>> graphMatrixMST = {
+	{{1, 2}, {3, 6}}, // edges from vertex 0
+	{{0, 2}, {2, 3}, {3, 8}, {4, 5}}, // edges from vertex 1
+	{{1, 3}, {4, 7}}, // edges from vertex 2
+	{{0, 6}, {1, 8}}, // edges from vertex 3
+	{{1, 5}, {2, 7}} // edges from vertex 4
+	};
+	std::cout << "MST weight using Prim's algorithm (GraphMatrix): " << graphMatrix.primMst() << std::endl;
+	std::cout << "MST weight using Prim's algorithm (GraphList): " << graphList.primMst() << std::endl;
+
+	
+	std::cout << "\nTesting Kruskal's algorithm for Minimum Spanning Tree (MST):" << std::endl;
+	std::vector<std::tuple<int, int, int>> edges = {
+	{0,1,2}, {0,3,6}, {1,2,3}, {1,3,8}, {1,4,5}, {2,4,7}
+	};
+	std::cout << "MST weight using Kruskal's algorithm: " << kruskal_mst(5, edges) << std::endl;
+
+	return 0;
+}
