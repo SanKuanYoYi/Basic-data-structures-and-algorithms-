@@ -1,0 +1,70 @@
+/*
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<int> inDegree(numCourses, 0);
+        vector<vector<int>> adjList(numCourses);
+        for (const auto& edge : prerequisites) {
+            adjList[edge[0]].push_back(edge[1]);
+            inDegree[edge[1]]++;
+        }
+
+        queue<int> q;
+        for (int i = 0; i < numCourses; i++)
+            if (!inDegree[i])
+                q.push(i);
+
+        vector<int> result;
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            result.push_back(u);
+            for (int v : adjList[u])
+                if (--inDegree[v] == 0)
+                    q.push(v);
+        }
+        reverse(result.begin(), result.end());
+        return (result.size() == numCourses) ? result : vector<int>();
+    }
+};
+*/
+
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> adjList(numCourses);
+        for (const auto& edge : prerequisites)
+            adjList[edge[1]].push_back(edge[0]);
+
+        vector<int> result;
+        vector<int> state(numCourses, 0);
+        bool hasCycle = false;
+
+        function<void(int)> dfs = [&](int u) {
+            state[u] = 1;
+            for (int v : adjList[u]) {
+                if (state[v] == 0) {
+                    dfs(v);
+                    if (hasCycle)
+                        return;
+                } else if (state[v] == 1) {
+                    hasCycle = true;
+                    return;
+                }
+            }
+            state[u] = 2;
+            result.push_back(u);
+        };
+
+        for (int i = 0; i < numCourses; i++) {
+            if (state[i] == 0) {
+                dfs(i);
+                if (hasCycle)
+                    return {};
+            }
+        }
+
+        reverse(result.begin(), result.end());
+        return result;
+    }
+};
