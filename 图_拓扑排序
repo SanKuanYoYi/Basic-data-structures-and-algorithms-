@@ -1,0 +1,226 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <functional>
+using namespace std;
+
+class TopologicalSort {
+private:
+	int n;
+	vector<vector<int>> graph;
+	vector<int> indegree;
+public:
+	TopologicalSort(int n) : n(n), graph(n), indegree(n, 0) {}
+
+	void addEdge(int u, int v) {
+		graph[u].push_back(v);
+		indegree[v]++;
+	}
+
+	/*
+	vector<int> KahnSort() {
+		queue<int>q;
+		for (int i = 0; i < n; i++) {
+			if (indegree[i] == 0) {
+				q.push(i);
+			}
+		}
+		vector<int>result;
+		while (!q.empty()){
+			int u = q.front();
+			q.pop();
+			result.push_back(u);
+
+			for (int v : graph[u]) {
+				indegree[v]--;
+				if (indegree[v] == 0) {
+					q.push(v);
+				}
+			}
+
+			if (result.size() != n) {
+				return {};
+			}		
+		}
+		return result;
+	}
+	*/
+
+	vector<int> kahnSortSafe() {
+		vector<int> indegCopy = indegree;   
+		queue<int> q;
+		for (int i = 0; i < n; ++i) {
+			if (indegCopy[i] == 0) q.push(i);
+		}
+
+		vector<int> result;
+		while (!q.empty()) {
+			int u = q.front(); q.pop();
+			result.push_back(u);
+			for (int v : graph[u]) {
+				if (--indegCopy[v] == 0) q.push(v);
+			}
+		}
+		return (result.size() == n) ? result : vector<int>();
+	}
+
+	vector<int> lexicographicallySmallestOrder() {
+		vector<int> indegCopy = indegree;   
+		priority_queue<int, vector<int>, greater<int>> pq;
+		for (int i = 0; i < n; ++i) {
+			if (indegCopy[i] == 0) pq.push(i);
+		}
+		vector<int> result;
+		while (!pq.empty()) {
+			int u = pq.top(); pq.pop();
+			result.push_back(u);
+			for (int v : graph[u]) {
+				if (--indegCopy[v] == 0) pq.push(v);
+			}
+		}
+		return (result.size() == n) ? result : vector<int>();
+	}
+};
+
+class AllTopologicalSorts {
+private:
+	int n;
+	vector<vector<int>> graph;
+	vector<int> indegree;
+	vector<int> currentOrder;
+	vector<vector<int>> allResults;
+public:
+	AllTopologicalSorts(int n) : n(n), graph(n), indegree(n, 0) {}
+
+	void addEdge(int u, int v) {
+		graph[u].push_back(v);
+		indegree[v]++;
+	}
+
+	void findAllTopologicalSorts() {
+		bool allVisited = true;
+		for (int i = 0; i < n; i++) {
+			if (indegree[i] == 0) {
+				allVisited = false;
+				currentOrder.push_back(i);
+				for (int v : graph[i]) {
+					indegree[v]--;
+				}
+				findAllTopologicalSorts();
+				currentOrder.pop_back();
+				for (int v : graph[i]) {
+					indegree[v]++;
+				}
+			}
+		}
+		if (allVisited) {
+			allResults.push_back(currentOrder);
+		}
+	}
+
+	void printAllTopologicalSorts() {
+		for (const auto& order : allResults) {
+			for (int node : order) {
+				cout << node << " ";
+			}
+			cout << endl;
+		}
+	}
+};
+
+class DFSBasedTopologicalSort {
+private:
+	int n;
+	vector<vector<int>> graph;
+	vector<int> state;//0 = unvisited, 1 = visiting, 2 = visited
+	vector<int> order;
+	bool hasCycle;
+public:
+	DFSBasedTopologicalSort(int n) : n(n), graph(n), state(n, 0), hasCycle(false) {}
+
+	void addEdge(int u, int v) {
+		graph[u].push_back(v);
+	}
+
+	void dfs(int u) {
+		state[u] = 1; // Mark as visiting
+		for(int v: graph[u]) {
+			if(state[v] == 0) {
+				dfs(v);
+				if(hasCycle) return;
+			} else if(state[v] == 1) {
+				hasCycle = true; // Cycle detected
+				return;
+			}
+		}
+		state[u] = 2; // Mark as visited
+		order.push_back(u);
+	}
+
+	vector<int> topologicalSort() {
+		for(int i = 0; i < n; i++) {
+			if(state[i] == 0) {
+				dfs(i);
+				if(hasCycle) return {}; // Return empty if cycle detected
+			}
+		}
+		reverse(order.begin(), order.end());
+		return order;
+	}
+};
+
+int main() {
+	// 边：5→2, 5→0, 4→0, 4→1, 2→3, 3→1
+	int n = 6;
+	TopologicalSort ts(n);
+	ts.addEdge(5, 2);
+	ts.addEdge(5, 0);
+	ts.addEdge(4, 0);
+	ts.addEdge(4, 1);
+	ts.addEdge(2, 3);
+	ts.addEdge(3, 1);
+
+	// 1. Kahn 算法（安全版）
+	cout << "=== Kahn 算法（一个合法拓扑序）===\n";
+	vector<int> res1 = ts.kahnSortSafe();
+	if (res1.empty()) cout << "存在环，无法拓扑排序\n";
+	else { for (int v : res1) cout << v << " "; cout << endl; }
+
+	// 2. 字典序最小的拓扑序
+	cout << "\n=== 字典序最小的拓扑序 ===\n";
+	vector<int> res2 = ts.lexicographicallySmallestOrder();
+	if (res2.empty()) cout << "存在环\n";
+	else { for (int v : res2) cout << v << " "; cout << endl; }
+
+	// 3. DFS 逆后序法
+	cout << "\n=== DFS 逆后序法（一个合法拓扑序）===\n";
+	DFSBasedTopologicalSort dfsTs(n);
+	dfsTs.addEdge(5, 2); dfsTs.addEdge(5, 0);
+	dfsTs.addEdge(4, 0); dfsTs.addEdge(4, 1);
+	dfsTs.addEdge(2, 3); dfsTs.addEdge(3, 1);
+	vector<int> res3 = dfsTs.topologicalSort();
+	if (res3.empty()) cout << "存在环\n";
+	else { for (int v : res3) cout << v << " "; cout << endl; }
+
+	// 4. 所有可能的拓扑排序（注意：节点数较多时组合爆炸，这里只有6个节点）
+	cout << "\n=== 所有可能的拓扑排序（回溯法）===\n";
+	AllTopologicalSorts allTs(n);
+	allTs.addEdge(5, 2); allTs.addEdge(5, 0);
+	allTs.addEdge(4, 0); allTs.addEdge(4, 1);
+	allTs.addEdge(2, 3); allTs.addEdge(3, 1);
+	allTs.findAllTopologicalSorts();
+	allTs.printAllTopologicalSorts();
+
+	// 附加测试：含环的图（验证检测环功能）
+	cout << "\n=== 含环图测试（添加边 1→2 和 2→1 形成环）===\n";
+	TopologicalSort cycleTs(3);
+	cycleTs.addEdge(0, 1);
+	cycleTs.addEdge(1, 2);
+	cycleTs.addEdge(2, 1);   // 环
+	auto cycleRes = cycleTs.kahnSortSafe();
+	if (cycleRes.empty()) cout << "正确检测到环，返回空序列\n";
+	else cout << "错误：未检测到环\n";
+
+	return 0;
+}
