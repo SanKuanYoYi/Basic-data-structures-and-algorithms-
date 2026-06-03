@@ -1,0 +1,40 @@
+class Solution {
+public:
+    int shortestPath(vector<vector<int>>& grid, int k) {
+        int m = grid.size(), n = grid[0].size();
+        if (k >= m + n - 3)
+            return m + n - 2;
+        vector<vector<int>> recordK(m, vector<int>(n, -1));
+        recordK[0][0] = k;
+        int dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+        queue<tuple<int, int, int>> q;
+        q.push({0, 0, k});
+
+        int steps = 0;
+        while (!q.empty()) {
+            int size = q.size();
+            for (int i = 0; i < size; i++) {
+                auto [x, y, remainK] = q.front();
+                q.pop();
+
+                if (x == m - 1 && y == n - 1)
+                    return steps;
+
+                for (auto& d : dirs) {
+                    int nx = x + d[0], ny = y + d[1];
+                    if (nx < 0 || nx >= m || ny < 0 || ny >= n)
+                        continue;
+
+                    int nextRemainK = remainK - (grid[nx][ny] == 1);
+                    if (nextRemainK < 0 || nextRemainK <= recordK[nx][ny])
+                        continue;
+                    recordK[nx][ny] = nextRemainK;
+                    q.push({nx, ny, nextRemainK});
+                }
+            }
+            steps++;
+        }
+        return -1;
+    }
+};
