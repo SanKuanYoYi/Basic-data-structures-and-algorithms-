@@ -1,0 +1,35 @@
+class Solution {
+public:
+    int minTimeToReach(vector<vector<int>>& moveTime) {
+        int n = moveTime.size(), m = moveTime[0].size();
+        vector<vector<long long>> dist(n, vector<long long>(m, LLONG_MAX));
+        using p = pair<long long, pair<int, int>>;
+        priority_queue<p, vector<p>, greater<p>> pq;
+
+        dist[0][0] = 0;
+        pq.push({0, {0, 0}});
+        int dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+        while (!pq.empty()) {
+            auto [t, pos] = pq.top();
+            pq.pop();
+            int x = pos.first, y = pos.second;
+            if (t > dist[x][y])
+                continue;
+            if (x == n - 1 && y == m - 1)
+                return t;
+
+            for (auto& d : dirs) {
+                int nx = x + d[0], ny = y + d[1];
+                if (nx < 0 || nx >= n || ny < 0 || ny >= m)
+                    continue;
+                long long nt = max(t, (long long)moveTime[nx][ny]) + 1;
+                if (nt < dist[nx][ny]) {
+                    dist[nx][ny] = nt;
+                    pq.push({nt, {nx, ny}});
+                }
+            }
+        }
+        return -1;
+    }
+};
