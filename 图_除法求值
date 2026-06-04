@@ -1,0 +1,54 @@
+class Solution {
+public:
+    vector<double> calcEquation(vector<vector<string>>& equations,
+                                vector<double>& values,
+                                vector<vector<string>>& queries) {
+        // 1. 给每个变量分配唯一 id
+        unordered_map<string, int> id;
+        int n = 0;
+        for (auto& eq : equations) {
+            if (!id.count(eq[0]))
+                id[eq[0]] = n++;
+            if (!id.count(eq[1]))
+                id[eq[1]] = n++;
+        }
+        // 2. 初始化邻接矩阵（乘积形式）
+        vector<vector<double>> graph(n, vector<double>(n, -1.0));
+        for (int i = 0; i < n; ++i)
+            graph[i][i] = 1.0;
+        for (int i = 0; i < equations.size(); ++i) {
+            int u = id[equations[i][0]], v = id[equations[i][1]];
+            double w = values[i];
+            graph[u][v] = w;
+            graph[v][u] = 1.0 / w;
+        }
+        // 3. Floyd 算法：乘法代替加法
+        for (int k = 0; k < n; ++k) {
+            for (int i = 0; i < n; ++i) {
+                if (graph[i][k] == -1.0)
+                    continue;
+                for (int j = 0; j < n; ++j) {
+                    if (graph[k][j] == -1.0)
+                        continue;
+                    // 如果 i->k 和 k->j 已知，则 i->j = (i->k) * (k->j)
+                    if (graph[i][j] == -1.0) {
+                        graph[i][j] = graph[i][k] * graph[k][j];
+                    }
+                    // 注意：如果多条路径，题目保证结果唯一，所以不需要取
+                    // min/max
+                }
+            }
+        }
+        // 4. 回答查询
+        vector<double> res;
+        for (auto& q : queries) {
+            if (!id.count(q[0]) || !id.count(q[1])) {
+                res.push_back(-1.0);
+                continue;
+            }
+            int u = id[q[0]], v = id[q[1]];
+            res.push_back(graph[u][v]);
+        }
+        return res;
+    }
+};
