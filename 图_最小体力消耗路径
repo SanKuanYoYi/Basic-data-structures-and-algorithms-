@@ -1,0 +1,40 @@
+class Solution {
+public:
+    int minimumEffortPath(vector<vector<int>>& heights) {
+        int n = heights.size(), m = heights[0].size();
+        vector<vector<int>> dist(n, vector<int>(m, INT_MAX));
+        vector<vector<bool>> visited(n, vector<bool>(m, false));
+
+        using p = pair<int, pair<int, int>>; // 距离--坐标
+        priority_queue<p, vector<p>, greater<p>> pq;
+
+        dist[0][0] = 0;
+        pq.push({0, {0, 0}});
+        int dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+        while (!pq.empty()) {
+            auto [d, pos] = pq.top();
+            pq.pop();
+            int x = pos.first, y = pos.second;
+
+            if (visited[x][y])
+                continue;
+            visited[x][y] = true; 
+            
+            if (x == n - 1 && y == m - 1)
+                return d;
+
+            for (auto& dir : dirs) {
+                int nx = x + dir[0], ny = y + dir[1];
+                if (nx < 0 || nx >= n || ny < 0 || ny >= m)
+                    continue;
+                int nd = max(d, abs(heights[x][y] - heights[nx][ny]));
+                if (nd < dist[nx][ny]) {
+                    dist[nx][ny] = nd;
+                    pq.push({nd, {nx, ny}});
+                }
+            }
+        }
+        return dist[n - 1][m - 1];
+    }
+};
