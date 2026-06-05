@@ -1,0 +1,33 @@
+class Solution {
+public:
+    int findIntegers(int n) {
+        string s;
+        while (n) {
+            s.push_back('0' + (n & 1));
+            n >>= 1;
+        }
+        reverse(s.begin(), s.end()); // 高位在左
+        int len = s.size();
+        vector<vector<int>> memo(len, vector<int>(2, -1));
+
+        function<int(int, int, bool)> dfs = [&](int pos, int prev_one,
+                                                bool limit) -> int {
+            if (pos == len)
+                return 1; // 成功构造一个数字（含 0）
+            if (!limit && memo[pos][prev_one] != -1)
+                return memo[pos][prev_one];
+            int up = limit ? s[pos] - '0' : 1;
+            int res = 0;
+            // 填 0
+            res += dfs(pos + 1, 0, limit && (0 == up));
+            // 填 1（需满足上一位不是 1 且当前位可以填 1）
+            if (prev_one == 0 && 1 <= up) {
+                res += dfs(pos + 1, 1, limit && (1 == up));
+            }
+            if (!limit)
+                memo[pos][prev_one] = res;
+            return res;
+        };
+        return dfs(0, 0, true);
+    }
+};
