@@ -1,0 +1,30 @@
+class Solution {
+public:
+    int countDigitOne(int n) {
+        string s = to_string(n);
+        int len = s.size();
+        vector<vector<int>> memo(len, vector<int>(len + 1, -1));
+        function<int(int, int, bool, bool)> dfs =
+            [&](int pos, int cnt, bool limit, bool started) -> int {
+            if (pos == len)
+                return cnt;
+            if (!limit && started && memo[pos][cnt] != -1)
+                return memo[pos][cnt];
+
+            int res = 0;
+            if (!started)
+                res += dfs(pos + 1, cnt, false, false);
+
+            int low = started ? 0 : 1;
+            int high = limit ? s[pos] - '0' : 9;
+            for (int d = low; d <= high; d++) {
+                int newCnt = cnt + (d == 1 ? 1 : 0);
+                res += dfs(pos + 1, newCnt, limit && d == high, true);
+            }
+            if (!limit && started)
+                memo[pos][cnt] = res;
+            return res;
+        };
+        return dfs(0, 0, true, false);
+    }
+};
